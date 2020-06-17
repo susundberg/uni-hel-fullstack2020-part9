@@ -1,19 +1,27 @@
 import { State } from "./state";
 import { Patient } from "../types";
 
-export type Action =
-  | {
-      type: "SET_PATIENT_LIST";
-      payload: Patient[];
-    }
-  | {
-      type: "ADD_PATIENT";
-      payload: Patient;
-    };
+
+export enum ActionType {
+  SET_PATIENT_LIST,
+  ADD_PATIENT
+}
+
+export type ActionSetPatientList = {
+  type: ActionType.SET_PATIENT_LIST;
+  payload: Patient[];
+};
+
+export type ActionAddPatient = {
+  type: ActionType.ADD_PATIENT;
+  payload: Patient;
+};
+
+export type Action = ActionSetPatientList | ActionAddPatient;
 
 export const reducer = (state: State, action: Action): State => {
   switch (action.type) {
-    case "SET_PATIENT_LIST":
+    case ActionType.SET_PATIENT_LIST:
       return {
         ...state,
         patients: {
@@ -24,7 +32,7 @@ export const reducer = (state: State, action: Action): State => {
           ...state.patients
         }
       };
-    case "ADD_PATIENT":
+    case ActionType.ADD_PATIENT:
       return {
         ...state,
         patients: {

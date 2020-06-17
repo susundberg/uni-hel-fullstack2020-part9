@@ -20,6 +20,25 @@ app.get('/api/diagnoses', (_req, res) => {
   res.json(diagnoses.get());
 });
 
+app.get('/api/patients/:id', (req, res) => {
+  const id = String(req.params.id);
+
+  if (!id) {
+    res.status(400).json({ error: 'Missing id' });
+    return;
+  }
+
+  try {
+    const pat = patients.find(id);
+    res.json(pat);
+  } catch (e) {
+    res.status(400).json({ error: String(e) });
+    return;
+  }
+
+
+});
+
 app.get('/api/patients', (_req, res) => {
   res.json(patients.get());
 });
@@ -27,7 +46,7 @@ app.get('/api/patients', (_req, res) => {
 app.post('/api/patients', (req, res) => {
 
   try {
-    const patNew = parsePatientNew( req.body  );
+    const patNew = parsePatientNew(req.body);
 
     patients.add(patNew);
     res.json(patNew);

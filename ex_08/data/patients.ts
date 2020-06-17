@@ -1,4 +1,4 @@
-import {v1} from 'uuid';
+import { v1 } from 'uuid';
 
 import { Patient, PatientFull, PatientNew, Gender } from '../src/types';
 
@@ -53,7 +53,7 @@ const get = (): Array<Patient> => {
 const add = (item: PatientNew): Array<Patient> => {
 
   const newItem = item as PatientFull;
- 
+
 
 
   newItem.id = v1();
@@ -64,9 +64,17 @@ const add = (item: PatientNew): Array<Patient> => {
 };
 
 
+const find = (id: string): PatientFull => {
+  const found = ENTRIES.find((x) => (x.id == id));
+  if (!found)
+    throw new Error("Patient not found");
+  return found;
+};
+
 export default {
   get,
   add,
-  
+  find,
+
 
 };
