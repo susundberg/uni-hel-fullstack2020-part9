@@ -1,11 +1,77 @@
 import React from "react";
 import axios from "axios";
-import { Container, Icon } from "semantic-ui-react";
+import { Container, Icon, List } from "semantic-ui-react";
 
 
-
-import { Patient, Gender } from "../types";
+import { useStateValue } from "../state";
+import {
+    Patient, Gender,
+    Entry
+} from "../types";
 import { apiBaseUrl } from "../constants";
+
+const assertNever = (value: never): never => {
+    throw new Error(
+        `Unhandled discriminated union member: ${JSON.stringify(value)}`
+    );
+};
+
+
+const EntryDetails: React.FC<{ entry: Entry }> = ({ entry }) => {
+
+    const [{ diagnoses }] = useStateValue();
+
+    let icon: "hospital symbol" | "doctor" | "talk";
+    const details = [];
+    let diagnosesInfo = <div> No diagnoses </div>;
+
+    switch (entry.type) {
+        case "Hospital":
+            icon = "hospital symbol";
+            details.push(<p key="disc"> Discharged: {entry.discharge.criteria} at {entry.discharge.date} </p>);
+            break;
+        case "OccupationalHealthcare":
+            icon = "doctor";
+            details.push(<p key="emp"> Employer: {entry.employerName}  </p>);
+            if (entry.sickLeave) {
+                details.push(<p key="sickleave"> Sickleave: {entry.sickLeave.startDate} -   {entry.sickLeave.endDate} </p>);
+            }
+            else {
+                details.push(<p key="sickleave"> Sickleave: No sickleave </p>);
+            }
+            break;
+        case "HealthCheck":
+            icon = "talk";
+            details.push(<p key="rating"> Rating: {entry.healthCheckRating} </p>);
+            break;
+        default:
+            return assertNever(entry);
+    }
+
+
+    console.log("Diagnos", diagnoses);
+
+    if (entry.diagnosisCodes) {
+        diagnosesInfo =
+            <ul>
+                {entry.diagnosisCodes.map((x) => {
+                    console.log(x);
+                    const latin = diagnoses[x]?.latin;
+                    return (<li key={x}> {x}: {diagnoses[x].name} {latin && `- Latin: ${latin}`}</li>);
+                })
+                }
+            </ul>;
+
+    }
+    return (<List.Item>
+        <h4> {entry.date} <Icon name={icon} /> </h4>
+        <div> Description: {entry.description}</div>
+        <div> Specialist: {entry.specialist}</div>
+        <div> Diagnose: {diagnosesInfo} </div>
+        {details}
+    </List.Item>);
+
+};
 
 const PatientDetailPage: React.FC<{ patientID: string }> = ({ patientID }) => {
 
@@ -14,7 +80,7 @@ const PatientDetailPage: React.FC<{ patientID: string }> = ({ patientID }) => {
 
 
     React.useEffect(() => {
-        const fetchDetail = async () => {
+        const fetchPatient = async () => {
             try {
                 const { data: patientData } = await axios.get<Patient>(`${apiBaseUrl}/patients/${patientID}`);
                 console.log("Set patient:", patientData);
@@ -23,7 +89,10 @@ const PatientDetailPage: React.FC<{ patientID: string }> = ({ patientID }) => {
                 console.error(e.response.data);
             }
         };
-        fetchDetail();
+
+
+        fetchPatient();
+
     }, [patientID]);
 
 
@@ -33,8 +102,8 @@ const PatientDetailPage: React.FC<{ patientID: string }> = ({ patientID }) => {
 
 
 
-    
-    const iconName = (x: Gender): "venus"|"mars"|"genderless" => {
+
+    const iconName = (x: Gender): "venus" | "mars" | "genderless" => {
         switch (x) {
             case Gender.Female:
                 return "venus";
@@ -56,6 +125,12 @@ const PatientDetailPage: React.FC<{ patientID: string }> = ({ patientID }) => {
                 <p> SSN: {patient.ssn}</p>
                 <p> Birth: {patient.dateOfBirth}</p>
                 <p> Occupation: {patient.occupation}</p>
+
+                <h4> Entries: </h4>
+                <List celled>
+                    {patient.entries.map((entry) => (<EntryDetails key={entry.id} entry={entry} />))}
+                </List>
+
             </Container>
 
         </div>

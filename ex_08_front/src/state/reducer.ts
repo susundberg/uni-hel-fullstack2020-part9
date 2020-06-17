@@ -1,10 +1,11 @@
 import { State } from "./state";
-import { Patient } from "../types";
+import { Patient, Diagnose } from "../types";
 
 
 export enum ActionType {
   SET_PATIENT_LIST,
-  ADD_PATIENT
+  ADD_PATIENT,
+  SET_DIAGNOSTIC_LIST,
 }
 
 export type ActionSetPatientList = {
@@ -17,7 +18,12 @@ export type ActionAddPatient = {
   payload: Patient;
 };
 
-export type Action = ActionSetPatientList | ActionAddPatient;
+export type ActionSetDiagnoseList = {
+  type: ActionType.SET_DIAGNOSTIC_LIST;
+  payload: Diagnose[];
+};
+
+export type Action = ActionSetPatientList | ActionAddPatient | ActionSetDiagnoseList;
 
 export const reducer = (state: State, action: Action): State => {
   switch (action.type) {
@@ -27,6 +33,18 @@ export const reducer = (state: State, action: Action): State => {
         patients: {
           ...action.payload.reduce(
             (memo, patient) => ({ ...memo, [patient.id]: patient }),
+            {}
+          ),
+          ...state.patients
+        }
+      };
+    case ActionType.SET_DIAGNOSTIC_LIST:
+      console.log("Set diagnoses reducer!");
+      return {
+        ...state,
+        diagnoses: {
+          ...action.payload.reduce(
+            (memo, diag) => ({ ...memo, [diag.code]: diag }),
             {}
           ),
           ...state.patients
