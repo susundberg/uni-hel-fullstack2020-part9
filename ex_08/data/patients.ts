@@ -1,6 +1,6 @@
 import { v1 } from 'uuid';
 
-import { Patient, PatientFull, PatientNew, Gender } from '../src/types';
+import { Patient, PatientFull, PatientNew, Gender, Entry, EntryNew } from '../src/types';
 
 const ENTRIES: Array<PatientFull> = [
   {
@@ -122,16 +122,21 @@ const get = (): Array<Patient> => {
 const add = (item: PatientNew): Array<Patient> => {
 
   const newItem = item as PatientFull;
-
-
-
   newItem.id = v1();
+  newItem.entries = [];
   console.log("Add item", newItem);
 
   ENTRIES.push(newItem);
   return get();
 };
 
+const addEntry = (patient: PatientFull, item: EntryNew): PatientFull => {
+  const nitem = item as Entry;
+  nitem.id = v1();
+
+  patient.entries.push(nitem);
+  return patient;
+};
 
 const find = (id: string): PatientFull => {
   const found = ENTRIES.find((x) => (x.id == id));
@@ -144,6 +149,7 @@ export default {
   get,
   add,
   find,
+  addEntry
 
 
 };

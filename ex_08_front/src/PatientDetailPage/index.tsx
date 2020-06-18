@@ -56,6 +56,9 @@ const EntryDetails: React.FC<{ entry: Entry }> = ({ entry }) => {
             <ul>
                 {entry.diagnosisCodes.map((x) => {
                     console.log(x);
+                    if (!diagnoses[x])
+                        return (<li key={x}> {x} </li>);
+
                     const latin = diagnoses[x]?.latin;
                     return (<li key={x}> {x}: {diagnoses[x].name} {latin && `- Latin: ${latin}`}</li>);
                 })
