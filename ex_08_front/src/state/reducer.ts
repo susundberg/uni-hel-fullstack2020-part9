@@ -6,6 +6,7 @@ export enum ActionType {
   SET_PATIENT_LIST,
   ADD_PATIENT,
   SET_DIAGNOSTIC_LIST,
+  ADD_PATIENT_ENTRY
 }
 
 export type ActionSetPatientList = {
@@ -18,16 +19,23 @@ export type ActionAddPatient = {
   payload: Patient;
 };
 
+// We dont really need this, as we are storing PUBLIC patient data, that does not have entry field.
+// export type ActionAddPatientEntry = {
+//   type: ActionType.ADD_PATIENT_ENTRY;
+//   payload: [string,Entry];
+// };
+
 export type ActionSetDiagnoseList = {
   type: ActionType.SET_DIAGNOSTIC_LIST;
   payload: Diagnose[];
 };
 
-export type Action = ActionSetPatientList | ActionAddPatient | ActionSetDiagnoseList;
+export type Action = ActionSetPatientList | ActionAddPatient | ActionSetDiagnoseList ;
 
 export const reducer = (state: State, action: Action): State => {
   switch (action.type) {
     case ActionType.SET_PATIENT_LIST:
+      console.log("Set patients:", action.payload);
       return {
         ...state,
         patients: {
@@ -58,6 +66,16 @@ export const reducer = (state: State, action: Action): State => {
           [action.payload.id]: action.payload
         }
       };
+    // case ActionType.ADD_PATIENT_ENTRY:
+    //   const newPatient = {...state.patients[action.payload[0]]};
+    //   newPatient.entries = newPatient.entries.concat( action.payload[1]); 
+    //   return {
+    //     ...state,
+    //     patients: {
+    //       ...state.patients,
+    //       [action.payload[0]]: newPatient
+    //     }
+    //   };
     default:
       return state;
   }

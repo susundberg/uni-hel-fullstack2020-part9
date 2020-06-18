@@ -35,7 +35,11 @@ const parseGender = (input: any): Gender => {
 
 const parseHealthCheckRating = (input: any): HealthCheckRating => {
 
-    if (Object.values(HealthCheckRating).includes(input))
+
+    console.log("Health input", input );
+    const num = parseInt(input);
+    
+    if (Object.values(HealthCheckRating).includes(num))
         return input as HealthCheckRating;
 
     throw new Error(`Not valid HealthCheckRating: ${String(input)}`);
